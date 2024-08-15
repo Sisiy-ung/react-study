@@ -6,6 +6,7 @@ export const getCity = (city) => {
             type: actionTypes.CURRENT_CITY,
             city
         }
+        // console.log(dispatch, 'dispatch-actionCreators', action)
         dispatch(action)
     }
 }

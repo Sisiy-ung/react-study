@@ -16,19 +16,32 @@ class Home extends Component {
     }
     initWeather(city) {
         console.log(city, 'city')
+        let _self = this
+        AMap.plugin('AMap.Weather', function() {
+
+        })
     }
     // mapState 函数定义了如何从 Redux store 的 state 中提取数据，并将这些数据映射到组件的 props 上。在你的 mapState 函数中，你从 Redux store 的 state 中提取了 city、weatherData、forecast 和 init 这些数据，并将它们作为对象的属性返回
     // 使用 connect(mapState, mapDispatch) 将 mapState 和 mapDispatch 与组件 Home 连接起来时，这些属性会被注入到 Home 组件的 props 中
     componentDidMount() {
         let _self = this
-        console.log(_self, '_self')
         if(_self.props.init) {
-            console.log(window.AMap, 'window.AMap')
+            console.log(_self, '_self')
+            // console.log(window.AMap, 'window.AMap')
             window.AMap.plugin('AMap.CitySearch', function() {
                 var citySearch = new window.AMap.CitySearch()
-                console.log(citySearch, 'citySearch')
-                citySearch.getLocalCity()
+                // console.log(citySearch, 'citySearch')
+                citySearch.getLocalCity(function(status, result) {
+                    // console.log(status, result, 'getLocalCity')
+                    if(status === 'complete' && result.info === 'OK') {
+                        _self.props.getCity(result.city)
+                        _self.initWeather(_self.props.city)
+                        _self.props.getInit()
+                    }
+                })
             })
+        } else {
+            _self.initWeather(_self.props.city)
         }
 
     }
@@ -42,6 +55,7 @@ class Home extends Component {
 }
 // 接收 Redux store 的 state 作为参数
 // 从 Redux store 的 state 中提取了 city、weatherData、forecast 和 init
+// 将Redux的【状态】映射到组件的属性上 可以通过this.props.city
 const mapState = (state) => {
     return ({
         city: state.get('city'),
@@ -56,6 +70,7 @@ const mapState = (state) => {
 
 
 // 这个 mapDispatch 函数通常会与 connect 函数一起使用，将这些 action creators 映射到 React 组件的 props 上，使得组件能够通过 props 调用这些 action creators 来更新 Redux store 中的状态。
+// 将操作（dispatch函数）映射到组件的属性上，包括这4个操作，这些操作会作为组件的属性，通过this.props.getCity
 const mapDispatch = (dispatch) => ({
     getCity(city) {
         dispatch(actionCreators.getCity(city))
