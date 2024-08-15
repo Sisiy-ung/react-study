@@ -2,6 +2,9 @@ import { Component } from "react";
 import { connect } from "react-redux";
 import { withRouter } from 'react-router-dom'
 import * as actionCreators from '@/store/actionCreators'
+import {
+    HomeWrapper
+} from './style'
 class Home extends Component {
     constructor(props) {
         super(props)
@@ -14,10 +17,26 @@ class Home extends Component {
     initWeather(city) {
         console.log(city, 'city')
     }
+    // mapState 函数定义了如何从 Redux store 的 state 中提取数据，并将这些数据映射到组件的 props 上。在你的 mapState 函数中，你从 Redux store 的 state 中提取了 city、weatherData、forecast 和 init 这些数据，并将它们作为对象的属性返回
+    // 使用 connect(mapState, mapDispatch) 将 mapState 和 mapDispatch 与组件 Home 连接起来时，这些属性会被注入到 Home 组件的 props 中
     componentDidMount() {
+        let _self = this
+        console.log(_self, '_self')
+        if(_self.props.init) {
+            console.log(window.AMap, 'window.AMap')
+            window.AMap.plugin('AMap.CitySearch', function() {
+                var citySearch = new window.AMap.CitySearch()
+                console.log(citySearch, 'citySearch')
+                citySearch.getLocalCity()
+            })
+        }
 
     }
     render() {
+        return (
+            <HomeWrapper>
+            </HomeWrapper>
+        )
 
     }
 }
