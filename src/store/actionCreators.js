@@ -1,6 +1,7 @@
 import * as actionTypes from './actionTypes'
 
 export const getCity = (city) => {
+    console.log(city, '打印city')
     return (dispatch) => {
         const action = {
             type: actionTypes.CURRENT_CITY,
