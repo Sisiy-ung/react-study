@@ -19,6 +19,7 @@ class Home extends Component {
         }
     }
     initWeather(city) {
+        console.log(city, 'initWeather-city')
         let _self = this
         window.AMap.plugin('AMap.Weather', function () {
             var weather = new window.AMap.Weather()
@@ -100,17 +101,39 @@ class Home extends Component {
         if (_self.props.init) {
             // console.log(_self, '_self')
             // console.log(window.AMap, 'window.AMap')
-            window.AMap.plugin('AMap.CitySearch', function () {
-                var citySearch = new window.AMap.CitySearch()
-                // console.log(citySearch, 'citySearch')
-                citySearch.getLocalCity(function (status, result) {
-                    console.log(status, result, 'getLocalCity')
-                    if (status === 'complete' && result.info === 'OK') {
-                        _self.props.getCity(result.city)
-                        _self.initWeather(result.city)
+            window.AMap.plugin('AMap.Geolocation', function () {
+
+                const geolocation = new window.AMap.Geolocation({
+                    // 是否使用高精度定位，默认：true
+                    enableHighAccuracy: true,
+                    // 设置定位超时时间，默认：无穷大
+                    timeout: 10000,
+                    // 定位按钮的停靠位置的偏移量
+                    offset: [10, 20],
+                    //  定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：false
+                    zoomToAccuracy: true,
+                    //  定位按钮的排放位置,  RB表示右下
+                    position: 'RB'
+                })
+                // console.log(geolocation, 'geolocation')
+                geolocation.getCurrentPosition(function (status, result) {
+                    if (status === 'complete' && result.info === "SUCCESS") {
+                        _self.props.getCity(result.addressComponent.city)
+                        _self.initWeather(result.addressComponent.city)
                         _self.props.getInit()
                     }
-                })
+                });
+
+                // var citySearch = new window.AMap.CitySearch()
+                // // console.log(citySearch, 'citySearch')
+                // citySearch.getLocalCity(function (status, result) {
+                //     console.log(status, result, 'getLocalCity')
+                //     if (status === 'complete' && result.info === 'OK') {
+                //         _self.props.getCity(result.city)
+                //         _self.initWeather(result.city)
+                //         _self.props.getInit()
+                //     }
+                // })
             })
         } else {
             _self.initWeather(_self.props.city)
@@ -118,12 +141,13 @@ class Home extends Component {
 
     }
     render() {
-        const { city, weatherData } = this.props
-        const reportTime = new String(weatherData.reportTime)
+        const {  weatherData } = this.props
+        console.log(this.props, weatherData, 'render-weatherData' )
+        // const reportTime = new String(weatherData.reportTime)
         return (
             < HomeWrapper imgUrl={require('../../static/img/4.jpg')}>
                 <Link to="/search">
-                    <Header><span>{city}</span></Header>
+                    <Header><span>{weatherData.city}</span></Header>
                 </Link>
                 <Temperature>
 

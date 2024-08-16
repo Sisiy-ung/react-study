@@ -18,6 +18,7 @@ export const getWeather = (data) => {
             type: actionTypes.CURRENT_WEATHER,
             weatherData: data
         }
+        console.log(data, 'getWeather-data')
         dispatch(action)
     }
 }
