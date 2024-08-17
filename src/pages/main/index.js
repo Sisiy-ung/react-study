@@ -1,4 +1,4 @@
-import { Component } from "react";
+import { Component, createRef } from "react";
 import { connect } from "react-redux";
 import { withRouter } from 'react-router-dom'
 import * as actionCreators from '@/store/actionCreators'
@@ -17,6 +17,8 @@ class Home extends Component {
             preWeather: [],
             loading: true
         }
+        
+      this.domRef = createRef()
     }
     initWeather(city) {
         console.log(city, 'initWeather-city')
@@ -35,6 +37,7 @@ class Home extends Component {
                 })
                 data.forecasts.map((item) => {
                     _self.state.foreData.push(item.dayTemp)
+                    console.log(_self.state.foreData, '_self.state.foreData')
                 })
                 // 初始化表格
                 _self.initEchart(_self.state.foreData)
@@ -46,7 +49,8 @@ class Home extends Component {
     }
 
     initEchart(array) {
-        let domChart = this.dom
+        let domChart = this.domRef
+        console.log(this.domRef, 'this.domRef')
         var myChart = echarts.init(domChart)
         let option = null
         option = {
@@ -115,8 +119,8 @@ class Home extends Component {
                     //  定位按钮的排放位置,  RB表示右下
                     position: 'RB'
                 })
-                // console.log(geolocation, 'geolocation')
                 geolocation.getCurrentPosition(function (status, result) {
+                console.log(status,result, 'geolocation')
                     if (status === 'complete' && result.info === "SUCCESS") {
                         _self.props.getCity(result.addressComponent.city)
                         _self.initWeather(result.addressComponent.city)
@@ -141,13 +145,13 @@ class Home extends Component {
 
     }
     render() {
-        const {  weatherData } = this.props
+        const {  city, weatherData } = this.props
         console.log(this.props, weatherData, 'render-weatherData' )
         // const reportTime = new String(weatherData.reportTime)
         return (
             < HomeWrapper imgUrl={require('../../static/img/4.jpg')}>
                 <Link to="/search">
-                    <Header><span>{weatherData.city}</span></Header>
+                    <Header><span>{city}</span></Header>
                 </Link>
                 <Temperature>
 
