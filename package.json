@@ -44,6 +44,7 @@
     ]
   },
   "devDependencies": {
-    "@craco/craco": "^7.1.0"
+    "@craco/craco": "^7.1.0",
+    "redux-devtools-extension": "^2.13.9"
   }
 }

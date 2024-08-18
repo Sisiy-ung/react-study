@@ -1,11 +1,12 @@
-import { Component, createRef } from "react";
+import { Component } from "react";
 import { connect } from "react-redux";
 import { withRouter } from 'react-router-dom'
 import * as actionCreators from '@/store/actionCreators'
 import {
     HomeWrapper,
     Header,
-    Temperature
+    Temperature,
+    Echartcontaier
 } from './style'
 import * as echarts from 'echarts';
 import { Link } from 'react-router-dom'
@@ -18,20 +19,18 @@ class Home extends Component {
             loading: true
         }
         
-      this.domRef = createRef()
     }
     initWeather(city) {
-        console.log(city, 'initWeather-city')
         let _self = this
         window.AMap.plugin('AMap.Weather', function () {
             var weather = new window.AMap.Weather()
             // 实时天气查询
             weather.getLive(city, (err, data) => {
-                console.log(err, data, 'getLive-err, data')
+                // console.log(err, data, 'getLive-err, data')
                 _self.props.getWeather(data)
             })
             weather.getForecast(city, (err, data) => {
-                console.log(err, data, 'getForecast-err, data')
+                // console.log(city, err, data, 'getForecast-err, data')
                 _self.setState({
                     preWeather: data.forecasts
                 })
@@ -48,10 +47,17 @@ class Home extends Component {
         })
     }
 
-    initEchart(array) {
-        let domChart = this.domRef
-        console.log(this.domRef, 'this.domRef')
-        var myChart = echarts.init(domChart)
+    initEchart = (array) => {
+        let domChart = this.dom
+        // console.log(this.dom, 'this.dom')
+        let myChart = null
+    
+        if (domChart) {
+            myChart = echarts.init(domChart);
+        } else {
+            console.log('DOM element is undefined');
+            return
+        }
         let option = null
         option = {
             title: {
@@ -103,8 +109,6 @@ class Home extends Component {
     componentDidMount() {
         let _self = this
         if (_self.props.init) {
-            // console.log(_self, '_self')
-            // console.log(window.AMap, 'window.AMap')
             window.AMap.plugin('AMap.Geolocation', function () {
 
                 const geolocation = new window.AMap.Geolocation({
@@ -120,7 +124,7 @@ class Home extends Component {
                     position: 'RB'
                 })
                 geolocation.getCurrentPosition(function (status, result) {
-                console.log(status,result, 'geolocation')
+                console.log( status,result, 'geolocation')
                     if (status === 'complete' && result.info === "SUCCESS") {
                         _self.props.getCity(result.addressComponent.city)
                         _self.initWeather(result.addressComponent.city)
@@ -146,7 +150,7 @@ class Home extends Component {
     }
     render() {
         const {  city, weatherData } = this.props
-        console.log(this.props, weatherData, 'render-weatherData' )
+        console.log(this.props.city, weatherData, 'render-weatherData' )
         // const reportTime = new String(weatherData.reportTime)
         return (
             < HomeWrapper imgUrl={require('../../static/img/4.jpg')}>
@@ -154,10 +158,8 @@ class Home extends Component {
                     <Header><span>{city}</span></Header>
                 </Link>
                 <Temperature>
-
-
                 </Temperature>
-
+            <Echartcontaier ref={(echart) => { this.dom = echart }}></Echartcontaier>
             </HomeWrapper>
         )
 
@@ -183,18 +185,19 @@ const mapState = (state) => {
 // 将操作（dispatch函数）映射到组件的属性上，包括这4个操作，这些操作会作为组件的属性，通过this.props.getCity
 const mapDispatch = (dispatch) => ({
     getCity(city) {
-        dispatch(actionCreators.getCity(city))
+      dispatch(actionCreators.getCity(city))
     },
     getInit() {
-        dispatch(actionCreators.getInit())
+      dispatch(actionCreators.getInit())
     },
     getWeather(data) {
-        dispatch(actionCreators.getWeather(data))
+      dispatch(actionCreators.getWeather(data))
     },
     getForecast(data) {
-        dispatch(actionCreators.getForecast(data))
+      dispatch(actionCreators.getForecast(data))
     }
-})
+  })
+  
 
 // connect 是 Redux 提供的高阶函数，连接 React 组件与 Redux store
 // connect 将 mapState 和 mapDispatch 函数与组件 Home 连接起来，并使用 withRouter 高阶组件对 Home 进行包装
