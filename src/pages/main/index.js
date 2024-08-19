@@ -6,10 +6,18 @@ import {
     HomeWrapper,
     Header,
     Temperature,
-    Echartcontaier
+    Echartcontaier,
+    MoreInfo,
+    MoreWrapper,
+    Extra,
+    MoreDay,
+    Loading,
+    SpanWrapper
 } from './style'
 import * as echarts from 'echarts';
 import { Link } from 'react-router-dom'
+import WeatherCircle from './component/cloudy'
+import { Spin } from 'antd';
 class Home extends Component {
     constructor(props) {
         super(props)
@@ -18,7 +26,7 @@ class Home extends Component {
             preWeather: [],
             loading: true
         }
-        
+
     }
     initWeather(city) {
         let _self = this
@@ -36,7 +44,7 @@ class Home extends Component {
                 })
                 data.forecasts.map((item) => {
                     _self.state.foreData.push(item.dayTemp)
-                    console.log(_self.state.foreData, '_self.state.foreData')
+                    // console.log(_self.state.foreData, '_self.state.foreData')
                 })
                 // 初始化表格
                 _self.initEchart(_self.state.foreData)
@@ -51,7 +59,7 @@ class Home extends Component {
         let domChart = this.dom
         // console.log(this.dom, 'this.dom')
         let myChart = null
-    
+
         if (domChart) {
             myChart = echarts.init(domChart);
         } else {
@@ -124,7 +132,7 @@ class Home extends Component {
                     position: 'RB'
                 })
                 geolocation.getCurrentPosition(function (status, result) {
-                console.log( status,result, 'geolocation')
+                    console.log(status, result, 'geolocation')
                     if (status === 'complete' && result.info === "SUCCESS") {
                         _self.props.getCity(result.addressComponent.city)
                         _self.initWeather(result.addressComponent.city)
@@ -149,17 +157,49 @@ class Home extends Component {
 
     }
     render() {
-        const {  city, weatherData } = this.props
-        console.log(this.props.city, weatherData, 'render-weatherData' )
-        // const reportTime = new String(weatherData.reportTime)
+        const { city, weatherData } = this.props
+        console.log(city, weatherData, this.state.preWeather, 'render-weatherData')
+        const reportTime = new String(weatherData.reportTime)
         return (
             < HomeWrapper imgUrl={require('../../static/img/4.jpg')}>
                 <Link to="/search">
-                    <Header><span>{city}</span></Header>
+                    <Header><span>{weatherData.city}</span></Header>
                 </Link>
                 <Temperature>
+                    <h2>{weatherData.temperature}°</h2>
+                    <span>{weatherData.weather}</span><span>|</span>
+                    <span>更新时间:{reportTime.split(' ')[1]}</span>
+                    <Extra>
+                        <dl>
+                            <dt>风力：{weatherData.windPower} | 风向： {weatherData.windDirection} | 空气湿度： {weatherData.humidity}%</dt>
+                        </dl>
+                    </Extra>
                 </Temperature>
-            <Echartcontaier ref={(echart) => { this.dom = echart }}></Echartcontaier>
+                <WeatherCircle />
+                <MoreInfo>
+                    <MoreWrapper>
+                        {this.state.preWeather.slice(1, 4).map(item => {
+                            <MoreDay key={item.date}>
+                                <p>{item.date.substring(5)}</p>
+                                <img alt="" src={require('../../static/img/' + `${item.dayWeather}.png`)}></img>
+                                <div className="temp">
+                                    <p>25℃</p>
+                                    <p>12℃</p>
+                                </div>
+                                <p>{item.dayWeather}</p>
+                            </MoreDay>
+                        })}
+                    </MoreWrapper>
+                </MoreInfo>
+                <Echartcontaier ref={(echart) => { this.dom = echart }}></Echartcontaier>
+                {
+                    this.state.loading ? <Loading>
+                        <SpanWrapper>
+                            <Spin />
+                        </SpanWrapper>
+                    </Loading> : null
+                }
+
             </HomeWrapper>
         )
 
@@ -185,20 +225,20 @@ const mapState = (state) => {
 // 将操作（dispatch函数）映射到组件的属性上，包括这4个操作，这些操作会作为组件的属性，通过this.props.getCity
 const mapDispatch = (dispatch) => ({
     getCity(city) {
-      dispatch(actionCreators.getCity(city))
+        dispatch(actionCreators.getCity(city))
     },
     getInit() {
-      dispatch(actionCreators.getInit())
+        dispatch(actionCreators.getInit())
     },
     getWeather(data) {
-      dispatch(actionCreators.getWeather(data))
+        dispatch(actionCreators.getWeather(data))
     },
     getForecast(data) {
-      dispatch(actionCreators.getForecast(data))
+        dispatch(actionCreators.getForecast(data))
     }
-  })
-  
+})
+
 
 // connect 是 Redux 提供的高阶函数，连接 React 组件与 Redux store
 // connect 将 mapState 和 mapDispatch 函数与组件 Home 连接起来，并使用 withRouter 高阶组件对 Home 进行包装
-export default connect(mapState, mapDispatch)(withRouter(Home))
+export default connect(mapState, mapDispatch)(withRouter(Home)) 

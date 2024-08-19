@@ -5,6 +5,7 @@ import store from './store'
 import MainPage from './pages/main'
 // import SearchCity from './pages/search'
 import { BrowserRouter as Router , Route} from 'react-router-dom'
+import 'antd/dist/antd.css'
 function App() {
   return (
     <Provider store={store}>
