@@ -18,6 +18,7 @@ import * as echarts from 'echarts';
 import { Link } from 'react-router-dom'
 import WeatherCircle from './component/cloudy'
 import { Spin } from 'antd';
+import { CaretDownOutlined } from '@ant-design/icons';
 class Home extends Component {
     constructor(props) {
         super(props)
@@ -44,7 +45,7 @@ class Home extends Component {
                 })
                 data.forecasts.map((item) => {
                     _self.state.foreData.push(item.dayTemp)
-                    // console.log(_self.state.foreData, '_self.state.foreData')
+                    console.log(_self.state.foreData, '_self.state.foreData')
                 })
                 // 初始化表格
                 _self.initEchart(_self.state.foreData)
@@ -163,7 +164,7 @@ class Home extends Component {
         return (
             < HomeWrapper imgUrl={require('../../static/img/4.jpg')}>
                 <Link to="/search">
-                    <Header><span>{weatherData.city}</span></Header>
+                    <Header><span>{weatherData.city}</span><CaretDownOutlined /></Header>
                 </Link>
                 <Temperature>
                     <h2>{weatherData.temperature}°</h2>
@@ -178,7 +179,21 @@ class Home extends Component {
                 <WeatherCircle />
                 <MoreInfo>
                     <MoreWrapper>
-                        {this.state.preWeather.slice(1, 4).map(item => {
+                        {
+                            this.state.preWeather.slice(1, 4).map((item) => (
+                                <MoreDay key={item.date}>
+                                    <p>{item.date.substring(5)}</p>
+                                    <img alt="" src={require('../../static/img/' + `${item.dayWeather}.png`)}></img>
+                                    <div className="temp">
+                                        <p>25℃</p>
+                                        <p>12℃</p>
+                                    </div>
+                                    <p>{item.dayWeather}</p>
+                                </MoreDay>
+                            ))
+                        }
+
+                        {/* {this.state.preWeather.slice(1, 4).map(item => {
                             <MoreDay key={item.date}>
                                 <p>{item.date.substring(5)}</p>
                                 <img alt="" src={require('../../static/img/' + `${item.dayWeather}.png`)}></img>
@@ -188,7 +203,7 @@ class Home extends Component {
                                 </div>
                                 <p>{item.dayWeather}</p>
                             </MoreDay>
-                        })}
+                        })} */}
                     </MoreWrapper>
                 </MoreInfo>
                 <Echartcontaier ref={(echart) => { this.dom = echart }}></Echartcontaier>
