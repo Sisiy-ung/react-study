@@ -4,7 +4,6 @@ import { Provider } from 'react-redux';
 import store from './store'
 import MainPage from './pages/main'
 import SearchCity from './pages/search'
-// import SearchCity from './pages/search'
 import { BrowserRouter as Router , Route} from 'react-router-dom'
 import 'antd/dist/antd.css'
 function App() {
@@ -16,7 +15,6 @@ function App() {
           <Route exact path="/search" component={SearchCity}></Route>
         </div>
       </Router>
-
     </Provider>
   );
 }
